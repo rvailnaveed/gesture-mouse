@@ -21,7 +21,7 @@ As mentioned in the table above, if a developer wishes to begin implementing a n
 
 ## What is a Branch?
 
-<img src="./resources/01.svg">
+<img src="https://wac-cdn.atlassian.com/dam/jcr:746be214-eb99-462c-9319-04a4d2eeebfa/01.svg?cdnVersion=768">
 
 Branching is a very powerful tool in git that allows developers to create an isolated line of development that can be worked on until a feature is implemented and can then be merged back into the original branch.
 
