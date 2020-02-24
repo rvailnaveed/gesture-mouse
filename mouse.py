@@ -23,6 +23,7 @@ while(1):
          
     # define range of skin color in HSV
         lower_skin = np.array([0,20,70], dtype=np.uint8)
+<<<<<<< HEAD
         upper_skin = np.array([20,255,255], dtype=np.uint8)       
      #extract skin colur imagw  
         mask = cv2.inRange(hsv, lower_skin, upper_skin)       
@@ -34,6 +35,29 @@ while(1):
         contours,hierarchy= cv2.findContours(mask,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)    
    #find contour of max area(hand)
         cnt = max(contours, key = lambda x: cv2.contourArea(x)) 
+=======
+        upper_skin = np.array([20,255,255], dtype=np.uint8)
+        
+     #extract skin colur imagw  
+        mask = cv2.inRange(hsv, lower_skin, upper_skin)
+        
+   
+        
+    #extrapolate the hand to fill dark spots within
+        mask = cv2.dilate(mask,kernel,iterations = 4)
+        
+    #blur the image
+        mask = cv2.GaussianBlur(mask,(5,5),100) 
+        
+        
+        
+    #find contours
+        contours,hierarchy= cv2.findContours(mask,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+    
+   #find contour of max area(hand)
+        cnt = max(contours, key = lambda x: cv2.contourArea(x))
+        
+>>>>>>> e05741dbdca7c5163ddcdc89e0f48c0837101006
     #approx the contour a little
         epsilon = 0.0005*cv2.arcLength(cnt,True)
         approx= cv2.approxPolyDP(cnt,epsilon,True)
@@ -99,11 +123,17 @@ while(1):
                 if arearatio<12:
                     cv2.putText(frame,'0',(0,50), font, 2, (0,0,255), 3, cv2.LINE_AA)
                 elif arearatio<17.5:
+<<<<<<< HEAD
                     cv2.putText(frame,'Best of luck',(0,50), font, 2, (0,0,255), 3, cv2.LINE_AA)                   
+=======
+                    cv2.putText(frame,'Best of luck',(0,50), font, 2, (0,0,255), 3, cv2.LINE_AA)
+                   
+>>>>>>> e05741dbdca7c5163ddcdc89e0f48c0837101006
                 else:
                     cv2.putText(frame,'1',(0,50), font, 2, (0,0,255), 3, cv2.LINE_AA)
                     
         elif l==2:
+<<<<<<< HEAD
             cv2.putText(frame,'2',(0,50), font, 2, (0,0,255), 3, cv2.LINE_AA)           
         elif l==3:         
               if arearatio<27:
@@ -118,6 +148,29 @@ while(1):
             cv2.putText(frame,'reposition',(0,50), font, 2, (0,0,255), 3, cv2.LINE_AA)        
         else :
             cv2.putText(frame,'reposition',(10,50), font, 2, (0,0,255), 3, cv2.LINE_AA)           
+=======
+            cv2.putText(frame,'2',(0,50), font, 2, (0,0,255), 3, cv2.LINE_AA)
+            
+        elif l==3:
+         
+              if arearatio<27:
+                    cv2.putText(frame,'3',(0,50), font, 2, (0,0,255), 3, cv2.LINE_AA)
+              else:
+                    cv2.putText(frame,'ok',(0,50), font, 2, (0,0,255), 3, cv2.LINE_AA)
+                    
+        elif l==4:
+            cv2.putText(frame,'4',(0,50), font, 2, (0,0,255), 3, cv2.LINE_AA)
+            
+        elif l==5:
+            cv2.putText(frame,'5',(0,50), font, 2, (0,0,255), 3, cv2.LINE_AA)
+            
+        elif l==6:
+            cv2.putText(frame,'reposition',(0,50), font, 2, (0,0,255), 3, cv2.LINE_AA)
+            
+        else :
+            cv2.putText(frame,'reposition',(10,50), font, 2, (0,0,255), 3, cv2.LINE_AA)
+            
+>>>>>>> e05741dbdca7c5163ddcdc89e0f48c0837101006
         #show the windows
         cv2.imshow('mask',mask)
         cv2.imshow('frame',frame)
@@ -126,5 +179,9 @@ while(1):
     k = cv2.waitKey(5) & 0xFF
     if k == 27:
         break
+<<<<<<< HEAD
+=======
+    
+>>>>>>> e05741dbdca7c5163ddcdc89e0f48c0837101006
 cv2.destroyAllWindows()
 cap.release()    
