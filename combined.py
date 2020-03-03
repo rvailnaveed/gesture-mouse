@@ -171,7 +171,7 @@ class combined:
             targetX = farthestPoint[0]
             targetY = farthestPoint[1]
             #pyautogui.moveTo(targetX*self.screenSizeX/frame.shape[1], targetY*self.screenSizeY/frame.shape[0])
-            pyautogui.moveTo(targetX*self.screenSizeX/frame.shape[1] * 2, targetY*self.screenSizeY/frame.shape[0] * 2)
+            pyautogui.moveTo(targetX*self.screenSizeX/frame.shape[1] * 3, targetY*self.screenSizeY/frame.shape[0] * 3)
         elif self.scrollMode:
             if len(self.traversePoints) >= 2:
                 movedDistance = self.traversePoints[-1][1] - self.traversePoints[-2][1]
@@ -215,13 +215,31 @@ class combined:
             hull = cv2.convexHull(maxContour)
             cv2.drawContours(contourAndHull, [maxContour], 0, (0, 255, 0), 2)
             cv2.drawContours(contourAndHull, [hull], 0, (0, 0, 255), 3)
-            extreme_top = tuple(hull[hull[:, :, 1].argmin()][0])
+            #extreme_top = tuple(hull[hull[:, :, 1].argmin()][0])
+            farthestPoint = maxContour[maxContour[:,:,1].argmin()][0]
+            if farthestPoint is not None:
+                # Reduce noise in farthestPoint
+                if len(self.traversePoints) > 0:
+                    if abs(farthestPoint[0] - self.traversePoints[-1][0]) < 10:
+                        farthestPoint[0] = self.traversePoints[-1][0]
+                    if abs(farthestPoint[1] - self.traversePoints[-1][1]) < 10:
+                        farthestPoint[1] = self.traversePoints[-1][1]
+                farthestPoint = tuple(farthestPoint)
+                print(farthestPoint)
+
+                cv2.circle(frame, farthestPoint, 5, [0, 0, 255], -1)
+
+                if len(self.traversePoints) < 10:
+                    self.traversePoints.append(farthestPoint)
+                else:
+                    self.traversePoints.pop(0)
+                    self.traversePoints.append(farthestPoint)
 
             found, cnt = self.countFingers(maxContour, contourAndHull)
             cv2.imshow("Contour and Hull", contourAndHull)
 
             if found:
-                self.execute(cnt, extreme_top, frame)
+                self.execute(cnt, farthestPoint, frame)
 
             centroid = self.getCentroid(maxContour)
             if centroid is not None:
