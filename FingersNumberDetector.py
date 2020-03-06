@@ -2,7 +2,8 @@ import cv2
 import math
 import numpy as np
 import pyautogui
-
+from pynput.mouse import Button,Controller
+mouse = Controller()
 
 class FingersNumberDetector:
 
@@ -120,9 +121,9 @@ class FingersNumberDetector:
         """
         x, y = 0.0, 0.4
         self.x0 = int(frame_width*x)
-        self.y0 = int(frame_height*y)
-        self.width = 260
-        self.height = 260
+        self.y0 = 60
+        self.width = 300
+        self.height = 350
 
     def countFingers(self, contour, contourAndHull):
         hull = cv2.convexHull(contour, returnPoints=False)
@@ -160,7 +161,7 @@ class FingersNumberDetector:
             pyautogui.press("up")
 
     def detectHand(self, frame, handHist):
-        roi = frame[self.y0:self.y0 + self.height, 
+        roi = frame[self.y0:self.y0 + self.height,
                 self.x0:self.x0 + self.width,
                 :]
 
@@ -200,7 +201,7 @@ class FingersNumberDetector:
 
             found, cnt = self.countFingers(maxContour, contourAndHull)
             cv2.imshow("Contour and Hull", contourAndHull)
-
+            #mouse.position =(100,100)
             if found:
                 self.execute(cnt)
 
@@ -215,6 +216,7 @@ class FingersNumberDetector:
 
         frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        #frame_height=frame_height -320
         self.setupFrame(frame_width, frame_height)
 
         while cap.isOpened():
