@@ -35,7 +35,7 @@ class FingersNumberDetector:
         i = 0
         for x in self.xs:
             for y in self.ys:
-                x0, y0 = int(x*rows), int(y*cols)
+                x0, y0 = int(x*rows), int(y*cols)+50
                 roi[i*20:i*20 + 20, :, :] = hsvFrame[x0:x0 + 20, y0:y0 + 20, :]
 
                 i += 1
@@ -47,7 +47,7 @@ class FingersNumberDetector:
 
         for x in self.xs:
             for y in self.ys:
-                x0, y0 = int(x*rows), int(y*cols)
+                x0, y0 = int(x*rows), int(y*cols) +50
                 cv2.rectangle(frame, (y0, x0), (y0 + 20, x0 + 20), (0, 255, 0), 1)
 
     def histMasking(self, frame, handHist):
