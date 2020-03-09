@@ -9,6 +9,10 @@ class combined:
     def __init__(self):
         pyautogui.PAUSE = 0
         pyautogui.FAILSAFE = False
+
+        # sets noise sensitivity level
+        self.noiseSensitivity = 2
+
         # taken from PointTracker:
         self.mouseMode = True
         self.scrollMode = False
@@ -220,9 +224,9 @@ class combined:
             if farthestPoint is not None:
                 # Reduce noise in farthestPoint
                 if len(self.traversePoints) > 0:
-                    if abs(farthestPoint[0] - self.traversePoints[-1][0]) < 10:
+                    if abs(farthestPoint[0] - self.traversePoints[-1][0]) < self.noiseSensitivity:
                         farthestPoint[0] = self.traversePoints[-1][0]
-                    if abs(farthestPoint[1] - self.traversePoints[-1][1]) < 10:
+                    if abs(farthestPoint[1] - self.traversePoints[-1][1]) < self.noiseSensitivity:
                         farthestPoint[1] = self.traversePoints[-1][1]
                 farthestPoint = tuple(farthestPoint)
                 print(farthestPoint)
