@@ -2,13 +2,25 @@ import cv2
 import math
 import numpy as np
 import pyautogui
-from pynput.mouse import Button,Controller
-mouse = Controller()
 
-class FingersNumberDetector:
+
+class combined:
 
     def __init__(self):
         pyautogui.PAUSE = 0
+        pyautogui.FAILSAFE = False
+
+        # sets noise sensitivity level
+        self.noiseSensitivity = 2
+
+        # taken from PointTracker:
+        self.mouseMode = True
+        self.scrollMode = False
+        #self.isHistCreated = False
+        self.traversePoints = []
+        screenSize = pyautogui.size()
+        self.screenSizeX = screenSize[0]
+        self.screenSizeY = screenSize[1]
 
         self.isHandHistCreated = False
         self.isBgCaptured = False
@@ -35,7 +47,7 @@ class FingersNumberDetector:
         i = 0
         for x in self.xs:
             for y in self.ys:
-                x0, y0 = int(x*rows), int(y*cols)+50
+                x0, y0 = int(x*rows), int(y*cols)
                 roi[i*20:i*20 + 20, :, :] = hsvFrame[x0:x0 + 20, y0:y0 + 20, :]
 
                 i += 1
@@ -47,7 +59,7 @@ class FingersNumberDetector:
 
         for x in self.xs:
             for y in self.ys:
-                x0, y0 = int(x*rows), int(y*cols) +50
+                x0, y0 = int(x*rows), int(y*cols)
                 cv2.rectangle(frame, (y0, x0), (y0 + 20, x0 + 20), (0, 255, 0), 1)
 
     def histMasking(self, frame, handHist):
@@ -121,9 +133,9 @@ class FingersNumberDetector:
         """
         x, y = 0.0, 0.4
         self.x0 = int(frame_width*x)
-        self.y0 = 60
-        self.width = 300
-        self.height = 350
+        self.y0 = int(frame_height*y)
+        self.width = 260
+        self.height = 260
 
     def countFingers(self, contour, contourAndHull):
         hull = cv2.convexHull(contour, returnPoints=False)
@@ -154,11 +166,20 @@ class FingersNumberDetector:
         angle = math.acos((b**2 + c**2 - a**2) / (2*b*c))
         return angle
 
-    def execute(self, cnt):
-        if cnt == 1:
-            pyautogui.press("down")
-        elif cnt == 2:
-            pyautogui.press("up")
+    def execute(self, cnt, farthestPoint, frame):
+        #if cnt == 1:
+        #    pyautogui.press("down")
+        #elif cnt == 2:
+        #    pyautogui.press("up")
+        if self.mouseMode:
+            targetX = farthestPoint[0]
+            targetY = farthestPoint[1]
+            #pyautogui.moveTo(targetX*self.screenSizeX/frame.shape[1], targetY*self.screenSizeY/frame.shape[0])
+            pyautogui.moveTo(targetX*self.screenSizeX/frame.shape[1] * 3, targetY*self.screenSizeY/frame.shape[0] * 3)
+        elif self.scrollMode:
+            if len(self.traversePoints) >= 2:
+                movedDistance = self.traversePoints[-1][1] - self.traversePoints[-2][1]
+                pyautogui.scroll(-movedDistance/2)
 
     def detectHand(self, frame, handHist):
         roi = frame[self.y0:self.y0 + self.height,
@@ -198,12 +219,31 @@ class FingersNumberDetector:
             hull = cv2.convexHull(maxContour)
             cv2.drawContours(contourAndHull, [maxContour], 0, (0, 255, 0), 2)
             cv2.drawContours(contourAndHull, [hull], 0, (0, 0, 255), 3)
+            #extreme_top = tuple(hull[hull[:, :, 1].argmin()][0])
+            farthestPoint = maxContour[maxContour[:,:,1].argmin()][0]
+            if farthestPoint is not None:
+                # Reduce noise in farthestPoint
+                if len(self.traversePoints) > 0:
+                    if abs(farthestPoint[0] - self.traversePoints[-1][0]) < self.noiseSensitivity:
+                        farthestPoint[0] = self.traversePoints[-1][0]
+                    if abs(farthestPoint[1] - self.traversePoints[-1][1]) < self.noiseSensitivity:
+                        farthestPoint[1] = self.traversePoints[-1][1]
+                farthestPoint = tuple(farthestPoint)
+                print(farthestPoint)
+
+                cv2.circle(frame, farthestPoint, 5, [0, 0, 255], -1)
+
+                if len(self.traversePoints) < 10:
+                    self.traversePoints.append(farthestPoint)
+                else:
+                    self.traversePoints.pop(0)
+                    self.traversePoints.append(farthestPoint)
 
             found, cnt = self.countFingers(maxContour, contourAndHull)
             cv2.imshow("Contour and Hull", contourAndHull)
-            #mouse.position =(100,100)
+
             if found:
-                self.execute(cnt)
+                self.execute(cnt, farthestPoint, frame)
 
             centroid = self.getCentroid(maxContour)
             if centroid is not None:
@@ -216,7 +256,6 @@ class FingersNumberDetector:
 
         frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        #frame_height=frame_height -320
         self.setupFrame(frame_width, frame_height)
 
         while cap.isOpened():
@@ -264,5 +303,5 @@ class FingersNumberDetector:
         cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    detector = FingersNumberDetector()
+    detector = combined()
     detector.startDetecting()
