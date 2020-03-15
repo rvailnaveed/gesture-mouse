@@ -2,7 +2,7 @@ import cv2
 import math
 import numpy as np
 import pyautogui
-
+import time
 
 class combined:
 
@@ -252,12 +252,15 @@ class combined:
                 cv2.circle(frame, tuple(centroid), 5, [255, 0, 0], -1)
 
     def startDetecting(self):
+        start_time = time.perf_counter()
+        has_captured = False
+        wait_for_hand_in_box = False
         cap = cv2.VideoCapture(0)
-
+        font = cv2.FONT_HERSHEY_SIMPLEX
         frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         self.setupFrame(frame_width, frame_height)
-
+         
         while cap.isOpened():
             ret, frame = cap.read()
 
@@ -271,6 +274,23 @@ class combined:
             cv2.rectangle(frame, (self.x0, self.y0), (self.x0 + self.width - 1, self.y0 + self.height - 1), (255, 0, 0), 2)
 
             k = cv2.waitKey(1) & 0xFF
+            if(not has_captured):
+                time_rem = 12-(time.perf_counter()-start_time)
+                if(time_rem >= 0): 
+                    cv2.putText(frame, "Align hand: " + str(int(time_rem)),(0,50), font, 2, (0,0,255), 3, cv2.LINE_AA)
+                else: 
+                   self.isHandHistCreated = True
+                   handHist = self.createHandHistogram(frame)
+                   has_captured = True
+                   wait_for_hand_in_box = True
+            elif(wait_for_hand_in_box):
+                time_rem = 17-(time.perf_counter()-start_time)
+                if(time_rem >= 0): 
+                    cv2.putText(frame, "Put hand in box: " + str(int(time_rem)),(0,50), font, 2, (0,0,255), 3, cv2.LINE_AA)
+                else:
+                    self.bgSubtractor = cv2.createBackgroundSubtractorMOG2(10, self.bgSubThreshold)
+                    self.isBgCaptured = True
+                    wait_for_hand_in_box = False
 
             if k == ord("z"):
                 self.isHandHistCreated = True
@@ -278,6 +298,7 @@ class combined:
             elif k == ord('b'):
                 self.bgSubtractor = cv2.createBackgroundSubtractorMOG2(10, self.bgSubThreshold)
                 self.isBgCaptured = True
+        
             elif k == ord("r"):
                 self.bgSubtractor = None
                 self.isBgCaptured = False
