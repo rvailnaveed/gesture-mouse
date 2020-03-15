@@ -1,10 +1,5 @@
 imutils==0.5.3
 numpy==1.17.3
 opencv-python==4.2.0.32
-<<<<<<< HEAD
 pyautogui===0.9.48
-//pynput==1.6.6
-//wxpython==4.0.7
-=======
-pyautogui==0.9.48
->>>>>>> 044f0c5a951f6777a968e77e84b41358f55afac3
+
