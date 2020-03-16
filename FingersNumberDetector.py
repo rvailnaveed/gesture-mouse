@@ -193,9 +193,14 @@ class FingersNumberDetector:
         if len(contours) > 0:
             maxContour = self.getMaxContours(contours)
 
+            c = max(contours, key=cv2.contourArea)
             # Draw contour and hull
             contourAndHull = np.zeros(roi.shape, np.uint8)
             hull = cv2.convexHull(maxContour)
+
+            extRight = tuple(c[c[:, :, 0].argmax()][0])
+            cv2.circle(frame, tuple(extRight), 5, [0, 0, 255], -1)
+
             cv2.drawContours(contourAndHull, [maxContour], 0, (0, 255, 0), 2)
             cv2.drawContours(contourAndHull, [hull], 0, (0, 0, 255), 3)
 
