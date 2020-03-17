@@ -34,7 +34,7 @@ class combined:
 
         # Gamma correction lookUpTable
         # Increase the contrast
-        gamma = 3
+        gamma = 1
         self.lookUpTable = np.empty((1,256), np.uint8)
         for i in range(256):
             self.lookUpTable[0,i] = np.clip(pow(i / 255.0, gamma) * 255.0, 0, 255)
@@ -286,7 +286,7 @@ class combined:
             elif(wait_for_hand_in_box):
                 time_rem = 17-(time.perf_counter()-start_time)
                 if(time_rem >= 0): 
-                    cv2.putText(frame, "Put hand in box: " + str(int(time_rem)),(0,50), font, 2, (0,0,255), 3, cv2.LINE_AA)
+                    cv2.putText(frame, "Make sure nothing in box" + str(int(time_rem)),(0,50), font, 2, (0,0,255), 3, cv2.LINE_AA)
                 else:
                     self.bgSubtractor = cv2.createBackgroundSubtractorMOG2(10, self.bgSubThreshold)
                     self.isBgCaptured = True
