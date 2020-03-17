@@ -255,7 +255,7 @@ class combined:
         start_time = time.perf_counter()
         has_captured = False
         wait_for_hand_in_box = False
-        cap = cv2.VideoCapture(0)
+        cap = cv2.VideoCapture(-1)
         font = cv2.FONT_HERSHEY_SIMPLEX
         frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
