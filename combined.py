@@ -253,6 +253,17 @@ class combined:
 
     def startDetecting(self):
         cap = cv2.VideoCapture(0)
+        #       key value
+        cap.set(3 , 640  ) # width
+        cap.set(4 , 480  ) # height
+        cap.set(10, 200  ) # brightness     min: 0   , max: 255 , increment:1
+        cap.set(11, 200   ) # contrast       min: 0   , max: 255 , increment:1
+        cap.set(12, 70   ) # saturation     min: 0   , max: 255 , increment:1
+        cap.set(13, 13   ) # hue
+        cap.set(14, 50   ) # gain           min: 0   , max: 127 , increment:1
+        #cap.set(15, -3   ) # exposure       min: -7  , max: -1  , increment:1
+        cap.set(17, 5000 ) # white_balance  min: 4000, max: 7000, increment:1
+        cap.set(28, 0    ) # focus          min: 0   , max: 255 , increment:5
 
         frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -260,6 +271,7 @@ class combined:
 
         while cap.isOpened():
             ret, frame = cap.read()
+            cap.set(10, 200  ) # brightness     min: 0   , max: 255 , increment:1
 
             # Increase the contrast
             # frame = cv2.convertScaleAbs(frame, alpha=3, beta=-500)
