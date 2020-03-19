@@ -1,9 +1,0 @@
-(tutorial-1-env) pi@raspberrypi:~/Documents/SWENG25 $ pip install -r requirements.txt
-DEPRECATION: Python 2.7 reached the end of its life on January 1st, 2020. Please upgrade your Python as Python 2.7 is no longer maintained. A future version of pip will drop support for Python 2.7. More details about Python 2 support in pip, can be found at https://pip.pypa.io/en/latest/development/release-process/#python-2-support
-Looking in indexes: https://pypi.org/simple, https://www.piwheels.org/simple
-Processing /home/pi/.cache/pip/wheels/16/84/1f/bf88641293cda2c8be81a5c4b8ca973dd9125a6dc3767417fd/imutils-0.5.3-cp27-none-any.whl
-Collecting numpy==1.16.6
-  Downloading numpy-1.16.6.zip (5.1 MB)
-     |████████████████████████████████| 5.1 MB 31 kB/s 
-ERROR: Could not find a version that satisfies the requirement opencv-python==4.2.0.32 (from -r requirements.txt (line 3)) (from versions: none)
-ERROR: No matching distribution found for opencv-python==4.2.0.32 (from -r requirements.txt (line 3))
