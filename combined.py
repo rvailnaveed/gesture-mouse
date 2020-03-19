@@ -16,6 +16,7 @@ class combined:
         # taken from PointTracker:
         self.mouseMode = True
         self.scrollMode = False
+        self.clickMode=True
         #self.isHistCreated = False
         self.traversePoints = []
         screenSize = pyautogui.size()
@@ -166,7 +167,7 @@ class combined:
         angle = math.acos((b**2 + c**2 - a**2) / (2*b*c))
         return angle
 
-    def execute(self, cnt, farthestPoint, frame):
+    def execute(self, cnt, farthestPoint, frame,extRight):
         #if cnt == 1:
         #    pyautogui.press("down")
         #elif cnt == 2:
@@ -176,6 +177,10 @@ class combined:
             targetY = farthestPoint[1]
             #pyautogui.moveTo(targetX*self.screenSizeX/frame.shape[1], targetY*self.screenSizeY/frame.shape[0])
             pyautogui.moveTo(targetX*self.screenSizeX/frame.shape[1] * 3, targetY*self.screenSizeY/frame.shape[0] * 3)
+        if self.clickMode:
+            rightSide=extRight[0]
+            if rightSide <"200":
+                pyautogui.click()
         elif self.scrollMode:
             if len(self.traversePoints) >= 2:
                 movedDistance = self.traversePoints[-1][1] - self.traversePoints[-2][1]
@@ -214,6 +219,7 @@ class combined:
         if len(contours) > 0:
             maxContour = self.getMaxContours(contours)
 
+            c= max(contours, key=cv2.contourArea)
             # Draw contour and hull
             contourAndHull = np.zeros(roi.shape, np.uint8)
             hull = cv2.convexHull(maxContour)
@@ -242,14 +248,21 @@ class combined:
             found, cnt = self.countFingers(maxContour, contourAndHull)
             cv2.imshow("Contour and Hull", contourAndHull)
 
-            if found:
-                self.execute(cnt, farthestPoint, frame)
 
             centroid = self.getCentroid(maxContour)
             if centroid is not None:
                 centroid[0] += self.x0
                 centroid[1] += self.y0
                 cv2.circle(frame, tuple(centroid), 5, [255, 0, 0], -1)
+
+            #draw dot on the most right contour
+            extRight = tuple(c[c[:, :, 0].argmax()][0])
+            dot=(extRight[0],centroid[1])
+            cv2.circle(frame, dot, 5, [0, 0, 255], -1)
+
+            if found:
+                self.execute(cnt, farthestPoint, frame,extRight)
+
 
     def startDetecting(self):
         start_time = time.perf_counter()
@@ -260,7 +273,7 @@ class combined:
         frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         self.setupFrame(frame_width, frame_height)
-         
+
         while cap.isOpened():
             ret, frame = cap.read()
 
@@ -276,16 +289,16 @@ class combined:
             k = cv2.waitKey(1) & 0xFF
             if(not has_captured):
                 time_rem = 12-(time.perf_counter()-start_time)
-                if(time_rem >= 0): 
+                if(time_rem >= 0):
                     cv2.putText(frame, "Align hand: " + str(int(time_rem)),(0,50), font, 2, (0,0,255), 3, cv2.LINE_AA)
-                else: 
+                else:
                    self.isHandHistCreated = True
                    handHist = self.createHandHistogram(frame)
                    has_captured = True
                    wait_for_hand_in_box = True
             elif(wait_for_hand_in_box):
                 time_rem = 17-(time.perf_counter()-start_time)
-                if(time_rem >= 0): 
+                if(time_rem >= 0):
                     cv2.putText(frame, "Make sure nothing in box" + str(int(time_rem)),(0,50), font, 2, (0,0,255), 3, cv2.LINE_AA)
                 else:
                     self.bgSubtractor = cv2.createBackgroundSubtractorMOG2(10, self.bgSubThreshold)
@@ -298,7 +311,7 @@ class combined:
             elif k == ord('b'):
                 self.bgSubtractor = cv2.createBackgroundSubtractorMOG2(10, self.bgSubThreshold)
                 self.isBgCaptured = True
-        
+
             elif k == ord("r"):
                 self.bgSubtractor = None
                 self.isBgCaptured = False
