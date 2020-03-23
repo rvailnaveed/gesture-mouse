@@ -260,9 +260,10 @@ class combined:
         frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         self.setupFrame(frame_width, frame_height)
-         
+
         while cap.isOpened():
             ret, frame = cap.read()
+            frame = cv2.flip(frame, 1)
             cap.set(10, 200  ) # brightness     min: 0   , max: 255 , increment:1
 
             # Increase the contrast
