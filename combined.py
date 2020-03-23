@@ -16,7 +16,7 @@ class combined:
         # taken from PointTracker:
         self.mouseMode = True
         self.scrollMode = False
-        self.clickMode=True
+        self.clickMode = True
         #self.isHistCreated = False
         self.traversePoints = []
         screenSize = pyautogui.size()
@@ -167,7 +167,7 @@ class combined:
         angle = math.acos((b**2 + c**2 - a**2) / (2*b*c))
         return angle
 
-    def execute(self, cnt, farthestPoint, frame,extRight):
+    def execute(self, cnt, farthestPoint, frame, dot):
         #if cnt == 1:
         #    pyautogui.press("down")
         #elif cnt == 2:
@@ -178,7 +178,7 @@ class combined:
             #pyautogui.moveTo(targetX*self.screenSizeX/frame.shape[1], targetY*self.screenSizeY/frame.shape[0])
             pyautogui.moveTo(targetX*self.screenSizeX/frame.shape[1] * 3, targetY*self.screenSizeY/frame.shape[0] * 3)
         if self.clickMode:
-            rightSide=extRight[0]
+            rightSide=dot[0]
             if rightSide <"200":
                 pyautogui.click()
         elif self.scrollMode:
@@ -261,7 +261,7 @@ class combined:
             cv2.circle(frame, dot, 5, [0, 0, 255], -1)
 
             if found:
-                self.execute(cnt, farthestPoint, frame,extRight)
+                self.execute(cnt, farthestPoint, frame, dot)
 
 
     def startDetecting(self):
