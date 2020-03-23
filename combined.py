@@ -2,7 +2,7 @@ import cv2
 import math
 import numpy as np
 import pyautogui
-
+import time
 
 class combined:
 
@@ -34,7 +34,7 @@ class combined:
 
         # Gamma correction lookUpTable
         # Increase the contrast
-        gamma = 3
+        gamma = 1
         self.lookUpTable = np.empty((1,256), np.uint8)
         for i in range(256):
             self.lookUpTable[0,i] = np.clip(pow(i / 255.0, gamma) * 255.0, 0, 255)
@@ -252,23 +252,15 @@ class combined:
                 cv2.circle(frame, tuple(centroid), 5, [255, 0, 0], -1)
 
     def startDetecting(self):
-        cap = cv2.VideoCapture(0)
-        #       key value
-        cap.set(3 , 640  ) # width
-        cap.set(4 , 480  ) # height
-        cap.set(10, 200  ) # brightness     min: 0   , max: 255 , increment:1
-        cap.set(11, 200   ) # contrast       min: 0   , max: 255 , increment:1
-        cap.set(12, 70   ) # saturation     min: 0   , max: 255 , increment:1
-        cap.set(13, 13   ) # hue
-        cap.set(14, 50   ) # gain           min: 0   , max: 127 , increment:1
-        #cap.set(15, -3   ) # exposure       min: -7  , max: -1  , increment:1
-        cap.set(17, 5000 ) # white_balance  min: 4000, max: 7000, increment:1
-        cap.set(28, 0    ) # focus          min: 0   , max: 255 , increment:5
-
+        start_time = time.perf_counter()
+        has_captured = False
+        wait_for_hand_in_box = False
+        cap = cv2.VideoCapture(-1)
+        font = cv2.FONT_HERSHEY_SIMPLEX
         frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         self.setupFrame(frame_width, frame_height)
-
+         
         while cap.isOpened():
             ret, frame = cap.read()
             cap.set(10, 200  ) # brightness     min: 0   , max: 255 , increment:1
@@ -283,6 +275,23 @@ class combined:
             cv2.rectangle(frame, (self.x0, self.y0), (self.x0 + self.width - 1, self.y0 + self.height - 1), (255, 0, 0), 2)
 
             k = cv2.waitKey(1) & 0xFF
+            if(not has_captured):
+                time_rem = 12-(time.perf_counter()-start_time)
+                if(time_rem >= 0):
+                    cv2.putText(frame, "Align hand: " + str(int(time_rem)),(0,50), font, 2, (0,0,255), 3, cv2.LINE_AA)
+                else:
+                   self.isHandHistCreated = True
+                   handHist = self.createHandHistogram(frame)
+                   has_captured = True
+                   wait_for_hand_in_box = True
+            elif(wait_for_hand_in_box):
+                time_rem = 17-(time.perf_counter()-start_time)
+                if(time_rem >= 0):
+                    cv2.putText(frame, "Make sure nothing in box" + str(int(time_rem)),(0,50), font, 2, (0,0,255), 3, cv2.LINE_AA)
+                else:
+                    self.bgSubtractor = cv2.createBackgroundSubtractorMOG2(10, self.bgSubThreshold)
+                    self.isBgCaptured = True
+                    wait_for_hand_in_box = False
 
             if k == ord("z"):
                 self.isHandHistCreated = True
@@ -290,6 +299,7 @@ class combined:
             elif k == ord('b'):
                 self.bgSubtractor = cv2.createBackgroundSubtractorMOG2(10, self.bgSubThreshold)
                 self.isBgCaptured = True
+
             elif k == ord("r"):
                 self.bgSubtractor = None
                 self.isBgCaptured = False

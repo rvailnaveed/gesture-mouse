@@ -2,7 +2,8 @@ import cv2
 import math
 import numpy as np
 import pyautogui
-
+from pynput.mouse import Button,Controller
+mouse = Controller()
 
 class FingersNumberDetector:
 
@@ -34,7 +35,7 @@ class FingersNumberDetector:
         i = 0
         for x in self.xs:
             for y in self.ys:
-                x0, y0 = int(x*rows), int(y*cols)
+                x0, y0 = int(x*rows), int(y*cols)+50
                 roi[i*20:i*20 + 20, :, :] = hsvFrame[x0:x0 + 20, y0:y0 + 20, :]
 
                 i += 1
@@ -46,7 +47,7 @@ class FingersNumberDetector:
 
         for x in self.xs:
             for y in self.ys:
-                x0, y0 = int(x*rows), int(y*cols)
+                x0, y0 = int(x*rows), int(y*cols) +50
                 cv2.rectangle(frame, (y0, x0), (y0 + 20, x0 + 20), (0, 255, 0), 1)
 
     def histMasking(self, frame, handHist):
@@ -120,9 +121,9 @@ class FingersNumberDetector:
         """
         x, y = 0.0, 0.4
         self.x0 = int(frame_width*x)
-        self.y0 = int(frame_height*y)
-        self.width = 260
-        self.height = 260
+        self.y0 = 60
+        self.width = 300
+        self.height = 350
 
     def countFingers(self, contour, contourAndHull):
         hull = cv2.convexHull(contour, returnPoints=False)
@@ -200,7 +201,7 @@ class FingersNumberDetector:
 
             found, cnt = self.countFingers(maxContour, contourAndHull)
             cv2.imshow("Contour and Hull", contourAndHull)
-
+            #mouse.position =(100,100)
             if found:
                 self.execute(cnt)
 
@@ -215,6 +216,7 @@ class FingersNumberDetector:
 
         frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        #frame_height=frame_height -320
         self.setupFrame(frame_width, frame_height)
 
         while cap.isOpened():
