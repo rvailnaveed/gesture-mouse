@@ -178,9 +178,10 @@ class combined:
             #pyautogui.moveTo(targetX*self.screenSizeX/frame.shape[1], targetY*self.screenSizeY/frame.shape[0])
             pyautogui.moveTo(targetX*self.screenSizeX/frame.shape[1] * 3, targetY*self.screenSizeY/frame.shape[0] * 3)
         if self.clickMode:
-            rightSide=dot[0]
-            if rightSide <200:
-                pyautogui.click()
+            if dot[0] is not None:
+                rightSide=dot[0]
+                if rightSide <200:
+                    pyautogui.click()
         elif self.scrollMode:
             if len(self.traversePoints) >= 2:
                 movedDistance = self.traversePoints[-1][1] - self.traversePoints[-2][1]
@@ -257,8 +258,9 @@ class combined:
 
             #draw dot on the most right contour
             extRight = tuple(c[c[:, :, 0].argmax()][0])
-            dot=(extRight[0],centroid[1])
-            cv2.circle(frame, dot, 5, [0, 0, 255], -1)
+            if extRight is not None and centroid is not None:
+                dot=(extRight[0],centroid[1])
+                cv2.circle(frame, dot, 5, [0, 0, 255], -1)
 
             if found:
                 self.execute(cnt, farthestPoint, frame, dot)
