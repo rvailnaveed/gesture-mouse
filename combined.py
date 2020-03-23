@@ -179,7 +179,7 @@ class combined:
             pyautogui.moveTo(targetX*self.screenSizeX/frame.shape[1] * 3, targetY*self.screenSizeY/frame.shape[0] * 3)
         if self.clickMode:
             rightSide=dot[0]
-            if rightSide <"200":
+            if rightSide <200:
                 pyautogui.click()
         elif self.scrollMode:
             if len(self.traversePoints) >= 2:
