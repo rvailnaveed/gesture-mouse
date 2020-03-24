@@ -278,6 +278,8 @@ class combined:
 
         while cap.isOpened():
             ret, frame = cap.read()
+            frame = cv2.flip(frame, 1)
+            cap.set(10, 200  ) # brightness     min: 0   , max: 255 , increment:1
 
             # Increase the contrast
             # frame = cv2.convertScaleAbs(frame, alpha=3, beta=-500)
