@@ -236,6 +236,8 @@ class combined:
                         farthestPoint[0] = self.traversePoints[-1][0]
                     if abs(farthestPoint[1] - self.traversePoints[-1][1]) < self.noiseSensitivity:
                         farthestPoint[1] = self.traversePoints[-1][1]
+                farthestPoint[0] += self.x0
+                farthestPoint[1] += self.y0
                 farthestPoint = tuple(farthestPoint)
                 print(farthestPoint)
 
@@ -259,7 +261,7 @@ class combined:
 
             #draw dot on the most right contour
             extRight = tuple(c[c[:, :, 0].argmax()][0])
-            dot=(extRight[0],centroid[1])
+            dot=(extRight[0] + self.x0, extRight[1] + self.y0)
             print (centroid)
             print ("centroid")
             print (dot)
@@ -275,7 +277,7 @@ class combined:
         start_time = time.perf_counter()
         has_captured = False
         wait_for_hand_in_box = False
-        cap = cv2.VideoCapture(-1)
+        cap = cv2.VideoCapture(0)
         font = cv2.FONT_HERSHEY_SIMPLEX
         frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
