@@ -10,6 +10,9 @@ class combined:
         pyautogui.PAUSE = 0
         pyautogui.FAILSAFE = False
 
+        self.alreadyClicked = True
+        self.clickCounter = 0
+
         # sets noise sensitivity level
         self.noiseSensitivity = 2
 
@@ -167,22 +170,27 @@ class combined:
         angle = math.acos((b**2 + c**2 - a**2) / (2*b*c))
         return angle
 
-    def execute(self, cnt, farthestPoint, frame, dot):
-        #if cnt == 1:
-        #    pyautogui.press("down")
-        #elif cnt == 2:
-        #    pyautogui.press("up")
+    def execute(self, cnt, highestPoint, frame, righmostPoint, centroid):
         if self.mouseMode:
-            targetX = farthestPoint[0]
-            targetY = farthestPoint[1]
-            #pyautogui.moveTo(targetX*self.screenSizeX/frame.shape[1], targetY*self.screenSizeY/frame.shape[0])
+            targetX = highestPoint[0]
+            targetY = highestPoint[1] - 100
             pyautogui.moveTo(targetX*self.screenSizeX/frame.shape[1] * 3, targetY*self.screenSizeY/frame.shape[0] * 3)
         if self.clickMode:
-            if dot[0] is not None:
-                rightSide=dot[0]
-                if rightSide < 200:
-                    print ("here")
-                    pyautogui.click()
+            if righmostPoint[0] is not None:
+                verticalDistance =  centroid[1] - highestPoint[1]
+                horizontalDistance = righmostPoint[0] - centroid[0]
+                ratio = verticalDistance / horizontalDistance
+                if ratio > 2:
+                    if not self.alreadyClicked:
+                        # sometimes a couple of clicks happen at the start which cause problems for me,
+                        # try remove the if and see if it works for you
+                        if self.clickCounter > 2:
+                            print("Click")
+                            pyautogui.click()
+                        self.alreadyClicked = True
+                        self.clickCounter += 1
+                elif self.alreadyClicked:
+                    self.alreadyClicked = False
         elif self.scrollMode:
             if len(self.traversePoints) >= 2:
                 movedDistance = self.traversePoints[-1][1] - self.traversePoints[-2][1]
@@ -228,26 +236,26 @@ class combined:
             cv2.drawContours(contourAndHull, [maxContour], 0, (0, 255, 0), 2)
             cv2.drawContours(contourAndHull, [hull], 0, (0, 0, 255), 3)
             #extreme_top = tuple(hull[hull[:, :, 1].argmin()][0])
-            farthestPoint = maxContour[maxContour[:,:,1].argmin()][0]
-            if farthestPoint is not None:
-                # Reduce noise in farthestPoint
+            highestPoint = maxContour[maxContour[:,:,1].argmin()][0]
+            if highestPoint is not None:
+                # Reduce noise in highestPoint
                 if len(self.traversePoints) > 0:
-                    if abs(farthestPoint[0] - self.traversePoints[-1][0]) < self.noiseSensitivity:
-                        farthestPoint[0] = self.traversePoints[-1][0]
-                    if abs(farthestPoint[1] - self.traversePoints[-1][1]) < self.noiseSensitivity:
-                        farthestPoint[1] = self.traversePoints[-1][1]
-                farthestPoint[0] += self.x0
-                farthestPoint[1] += self.y0
-                farthestPoint = tuple(farthestPoint)
-                print(farthestPoint)
+                    if abs(highestPoint[0] - self.traversePoints[-1][0]) < self.noiseSensitivity:
+                        highestPoint[0] = self.traversePoints[-1][0]
+                    if abs(highestPoint[1] - self.traversePoints[-1][1]) < self.noiseSensitivity:
+                        highestPoint[1] = self.traversePoints[-1][1]
+                highestPoint[0] += self.x0
+                highestPoint[1] += self.y0
+                highestPoint = tuple(highestPoint)
+                #print(highestPoint)
 
-                cv2.circle(frame, farthestPoint, 5, [0, 0, 255], -1)
+                cv2.circle(frame, highestPoint, 5, [0, 0, 255], -1)
 
                 if len(self.traversePoints) < 10:
-                    self.traversePoints.append(farthestPoint)
+                    self.traversePoints.append(highestPoint)
                 else:
                     self.traversePoints.pop(0)
-                    self.traversePoints.append(farthestPoint)
+                    self.traversePoints.append(highestPoint)
 
             found, cnt = self.countFingers(maxContour, contourAndHull)
             cv2.imshow("Contour and Hull", contourAndHull)
@@ -259,18 +267,18 @@ class combined:
                 centroid[1] += self.y0
                 cv2.circle(frame, tuple(centroid), 5, [255, 0, 0], -1)
 
-            #draw dot on the most right contour
+            #draw righmostPoint on the most right contour
             extRight = tuple(c[c[:, :, 0].argmax()][0])
-            dot=(extRight[0] + self.x0, extRight[1] + self.y0)
-            print (centroid)
-            print ("centroid")
-            print (dot)
-            print ("dot")
+            righmostPoint=(extRight[0] + self.x0, extRight[1] + self.y0)
+            #print (centroid)
+            #print ("centroid")
+            #print (righmostPoint)
+            #print ("righmostPoint")
             if extRight is not None and centroid is not None:
-                cv2.circle(frame, dot, 5, [0, 0, 255], -1)
+                cv2.circle(frame, righmostPoint, 5, [0, 0, 255], -1)
 
             if found:
-                self.execute(cnt, farthestPoint, frame, dot)
+                self.execute(cnt, highestPoint, frame, righmostPoint, centroid)
 
 
     def startDetecting(self):
