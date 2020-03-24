@@ -48,7 +48,7 @@ class combined:
         i = 0
         for x in self.xs:
             for y in self.ys:
-                x0, y0 = int(x*rows), int(y*cols)
+                x0, y0 = int(x*rows), int(y*cols)+50
                 roi[i*20:i*20 + 20, :, :] = hsvFrame[x0:x0 + 20, y0:y0 + 20, :]
 
                 i += 1
@@ -60,7 +60,7 @@ class combined:
 
         for x in self.xs:
             for y in self.ys:
-                x0, y0 = int(x*rows), int(y*cols)
+                x0, y0 = int(x*rows), int(y*cols)+50
                 cv2.rectangle(frame, (y0, x0), (y0 + 20, x0 + 20), (0, 255, 0), 1)
 
     def histMasking(self, frame, handHist):
@@ -134,9 +134,9 @@ class combined:
         """
         x, y = 0.0, 0.4
         self.x0 = int(frame_width*x)
-        self.y0 = int(frame_height*y)
-        self.width = 260
-        self.height = 260
+        self.y0 = 60 #int(frame_height*y)
+        self.width = 300
+        self.height = 350
 
     def countFingers(self, contour, contourAndHull):
         hull = cv2.convexHull(contour, returnPoints=False)
@@ -180,7 +180,8 @@ class combined:
         if self.clickMode:
             if dot[0] is not None:
                 rightSide=dot[0]
-                if rightSide <200:
+                if rightSide < 200:
+                    print ("here")
                     pyautogui.click()
         elif self.scrollMode:
             if len(self.traversePoints) >= 2:
@@ -258,8 +259,12 @@ class combined:
 
             #draw dot on the most right contour
             extRight = tuple(c[c[:, :, 0].argmax()][0])
+            dot=(extRight[0],centroid[1])
+            print (centroid)
+            print ("centroid")
+            print (dot)
+            print ("dot")
             if extRight is not None and centroid is not None:
-                dot=(extRight[0],centroid[1])
                 cv2.circle(frame, dot, 5, [0, 0, 255], -1)
 
             if found:
