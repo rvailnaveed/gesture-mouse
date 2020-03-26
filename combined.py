@@ -309,7 +309,7 @@ class combined:
             if(not has_captured):
                 time_rem = 12-(time.perf_counter()-start_time)
                 if(time_rem >= 0):
-                    cv2.putText(frame, "Align hand: " + str(int(time_rem)),(0,50), font, 2, (0,0,255), 3, cv2.LINE_AA)
+                    cv2.putText(frame, "Align hand: " + str(int(time_rem)),(10,42), font, 1, (0,0,255), 2, cv2.LINE_AA)
                 else:
                    self.isHandHistCreated = True
                    handHist = self.createHandHistogram(frame)
@@ -318,7 +318,7 @@ class combined:
             elif(wait_for_hand_in_box):
                 time_rem = 17-(time.perf_counter()-start_time)
                 if(time_rem >= 0):
-                    cv2.putText(frame, "Make sure nothing in box" + str(int(time_rem)),(0,50), font, 2, (0,0,255), 3, cv2.LINE_AA)
+                    cv2.putText(frame, "Make sure nothing in box: " + str(int(time_rem)),(10,42), font, 1, (0,0,255), 2, cv2.LINE_AA)
                 else:
                     self.bgSubtractor = cv2.createBackgroundSubtractorMOG2(10, self.bgSubThreshold)
                     self.isBgCaptured = True
