@@ -6,7 +6,9 @@
 
 ## How to Run
 + Clone or download this repository
-+ In the root directory of the repo run the command `python combined.py`
++ Navigate to the root directory of the repo
++ Run the command `pip install -r requirements.txt` to install project dependencies
++ Run the command `python combined.py` to start the project
 + A box will pop up, you are given 10 seconds to align your palm inside the 9 green boxes
 + After this make sure that nothing is moving inside the blue box.
 + Navigate your hand inside the blue box
